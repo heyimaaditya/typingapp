@@ -5,7 +5,7 @@ import { BrowserRouter as Router,Route,Routes } from 'react-router-dom';
 import Home from './pages/Home';
 import { useEffect, useState } from 'react';
 import { socket } from './utils/socket';
-
+import GameSettings from './pages/GameSettings';
 function App(){
   const [isConnected, setIsConnected] = useState(socket.connected);
 
@@ -27,13 +27,14 @@ function App(){
     };
   }, []);
   return (
-    <Layout>
-      <Router>
+    <Router>
+      <Layout>
         <Routes>
           <Route path='/' element={<Home/>}/>
+          <Route path='/game-settings' element={<GameSettings/>}/>
         </Routes>
-      </Router>
-    </Layout>
+      </Layout>
+    </Router>
   )
 }
 export default App;

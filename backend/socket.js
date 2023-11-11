@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React from "react";
 module.exports=function Socket(io){
   io.on('connection',(socket)=>{

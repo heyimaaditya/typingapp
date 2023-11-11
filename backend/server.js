@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React from "react";
 require('dotenv').config({path:'.env'});
 // sets up an event listener for the 'uncaughtException' event in the Node.js .
