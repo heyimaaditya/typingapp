@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
+import { PiPencilCircleFill } from 'react-icons/pi';
 import GameModeButton from './GameModeButton';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { PiPencilCircleFill } from 'react-icons/pi';
+
 type Props = {};
 
 type Inputs = {
-  dificulty: string;
+  difficulty: string;
 };
 
 const SinglePlayerMode = (props: Props) => {
@@ -19,10 +20,10 @@ const SinglePlayerMode = (props: Props) => {
 
   return (
     <div className="p-6 space-y-4">
-      <h3 className="font-semibold">
-        Solo Mode{' '}
+      <h3 className="text-2xl lg:text-3xl font-semibold">
+        Practice Your Typings{' '}
         <span>
-          <PiPencilCircleFill className="inline" />
+          <PiPencilCircleFill className="inline pl-1" />
         </span>
       </h3>
 

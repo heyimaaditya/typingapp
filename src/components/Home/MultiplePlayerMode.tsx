@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import { BsGlobeAmericas } from 'react-icons/bs';
 import GameModeButton from './GameModeButton';
 
@@ -6,15 +6,14 @@ type Props = {};
 
 const MultiplePlayerMode = (props: Props) => {
   return (
-    <div className="p-6 cursor-not-allowed space-y-4 opacity-60">
-      <h3 className="font-semibold">
+    <div className="p-6 space-y-4">
+      <h3 className="text-2xl font-semibold">
         Multi Player{' '}
         <span>
-          <BsGlobeAmericas className="inline" />
+          <BsGlobeAmericas className="inline pl-1" />
         </span>{' '}
       </h3>
-      <button disabled className="cursor-not-allowed disabled:opacity-50 "><GameModeButton mode="online" text="Join Game" /></button>
-      
+      <GameModeButton mode="online" text="Join Game" />
     </div>
   );
 };

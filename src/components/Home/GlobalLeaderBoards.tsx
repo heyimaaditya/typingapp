@@ -21,7 +21,7 @@ export const LeaderBoardRow = () => {
     <tr className="even:bg-gray-300 odd:bg-white">
       <td className=" text-black">1</td>
       <td className=" text-black flex items-center">
-        <UserIcon /> {/* Add the user icon here */}
+        <UserIcon /> 
         Leg2.O
       </td>
       <td className=" text-black">196</td>

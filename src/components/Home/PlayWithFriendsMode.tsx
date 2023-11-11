@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react'
-import {AiOutlineTeam} from 'react-icons/ai'
+import { AiOutlineTeam } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
 import GameModeButton from './GameModeButton';
 
@@ -12,7 +12,7 @@ const PlayWithFriendsMode = (props: Props) => {
       <h3 className="text-2xl font-semibold">
         Play With Friends{' '}
         <span>
-          <AiOutlineTeam className="inline" />
+          <AiOutlineTeam className="inline pl-1" />
         </span>{' '}
       </h3>
 

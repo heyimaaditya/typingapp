@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from "react";
 import { Link } from "react-router-dom";
-import Logo from '../assets/logo.png'
+import Logo from '../../assets/logo.png'
 type Props={};
 const Navbar=(props:Props)=>{
+  
   return (
-    <nav className="py-1 w-full bg-primary">
+    <nav className='py-1 px-4 w-full bg-primary'>
       <div className="max-w-7xl flex items-center justify-between mx-auto">
-        <Link to="/" className="flex items-center h-full">
-          <img className="h-16" src={Logo} alt="TypeSwiftLogo" />
+        <Link to='/' className="flex items-center h-full" >
+         <img className='h-16' src={Logo} alt='logo'/> 
         </Link>
-        
         <div className="space-x-4 flex items-center">
           <div className="flex items-center space-x-4">
             <div className="flex space-x-4 items-end">
@@ -40,4 +40,5 @@ const Navbar=(props:Props)=>{
     </nav>
   );
 };
+
 export default Navbar;
