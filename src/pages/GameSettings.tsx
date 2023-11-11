@@ -33,11 +33,12 @@ const data = [
   },
 ];
 const CreateRoom = () => {
+  //setup and manages a react form using hooks
   const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    watch,
+    register,//it enables the form to  manages their validation,state etc. 
+    handleSubmit,//used to manage the form submission
+    formState: { errors },//formstate object contains various info related to state of the from here it handles the eror
+    watch,//it is used to watch the changes happened in form and change according to it
   } = useForm<Inputs>();
   const navigate = useNavigate();
 
@@ -45,7 +46,7 @@ const CreateRoom = () => {
     navigate('/game', { state: data });
   };
 
-  const { state } = useLocation();
+  const { state } = useLocation();//give access to current location of object and to get the state property from the object returned by the useLocation hook.
   const mode = watch('mode') || state.mode;
 
   return (

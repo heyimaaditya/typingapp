@@ -1,10 +1,10 @@
 /* eslint-disable import/first */
 import React from 'react'
 type Props={};
-import GlobalLeaderBoards from '../components/Home/GlobalLeaderBoards';
-import MultiplePlayerMode from '../components/Home/MultiplePlayerMode';
-import PlayWithFriendsMode from '../components/Home/PlayWithFriendsMode';
-import SinglePlayerMode from '../components/Home/SinglePlayerMode';
+import GlobalLeaderBoards from '../components/Home/LeaderBoards';
+import MultiplePlayerMode from '../components/Home/MultiplePlayer';
+import PlayWithFriendsMode from '../components/Home/PlayWithFriends';
+import SinglePlayerMode from '../components/Home/SinglePlayer';
 const Home = (props: Props) => {
   return (
     <div className="p-6 sm:p-10">

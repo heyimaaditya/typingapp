@@ -10,7 +10,8 @@ const Layout=({children}:Props)=>{
   return (
     <div className="bg-dark text-white w-full h-full min-h-screen">
       <Navbar/>
-      <ToastContainer position="bottom-left" />
+      
+      <ToastContainer position="bottom-left" />{/*showing any alert or notification on bottom left side of page*/ }
       {children}
       <Footer/>
     </div>

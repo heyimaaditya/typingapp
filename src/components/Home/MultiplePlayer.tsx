@@ -1,6 +1,6 @@
 import React from 'react';
 import { BsGlobeAmericas } from 'react-icons/bs';
-import GameModeButton from './GameModeButton';
+import GameModeButton from './GameMode';
 
 type Props = {};
 
