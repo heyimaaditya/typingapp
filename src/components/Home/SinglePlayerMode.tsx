@@ -12,7 +12,7 @@ const SinglePlayerMode=(props:Props)=>{
   const onSubmit:SubmitHandler<Inputs>=(data)=>console.log(data);
   return (
     <div className='p-6 space-y-4'>
-      <h3 className='text-3xl font-semibold'>
+      <h3 className='text-2xl font-semibold lg:text-3xl'>
         Practice your Typings{''}
         <span>
           <PiPencilCircleFill className='inline pl-1'/>
