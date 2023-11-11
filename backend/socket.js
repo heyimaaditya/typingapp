@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
 import React from "react";
 module.exports=function Socket(io){
@@ -9,15 +10,23 @@ module.exports=function Socket(io){
       'send-message',//Handles the 'send-message' event when received from a client
       ({recipients,type,content,createdAt,roomId,sender})=>{}
     );
-    const rooms=[];
+    const rooms={};
     //handle room creation 
-    socket.on('createRoom',(roomId)=>{
+    socket.on('createRoom',({roomId,name,image})=>{
       const roomId=generateRoomCode();
       //if the room doesn't exist create it and add creator to it
       if(!rooms[roomId]){
-        rooms[roomId]=[socket.id];
+        rooms[roomName]=[];//create an empty array for new room
         socket.join(roomId);
         console.log(`Room ${roomId} created by ${socket.id}`);
+        // Create a user object with socket ID, name, and image
+        const user = { id: socket.id, name, image };
+
+        // Add user to the list of active users in the room
+        rooms.roomId.push(user);
+
+        // Emit the list of active users in the room to all users in the room
+        io.to(roomId).emit('activeUsers', rooms[roomId]);
       }else{
         ///already exist
         socket.emit('roomError','Room with this ID already exist');
@@ -25,7 +34,7 @@ module.exports=function Socket(io){
 
     })
     //handle joining a room
-    socket.on('joinRoom',(roomId)=>{
+    socket.on('joinRoom',({roomId,name,image,})=>{
       if(!rooms[roomId]){
         //doesnt exist
         socket.emit('roomError','Room with this ID doesnt exist')
@@ -34,9 +43,15 @@ module.exports=function Socket(io){
         socket.emit('roomError','Room is already full')
       }else{
         //add participant to room 
-        rooms[roomId].push(socket.id)
+       
         socket.join(roomId);
         console.log(`${socket.id} joined room ${roomId}`)
+        // Create a user object with socket ID, name, and image
+        const user = {id:socket.id,name ,image};
+        // Add user to the list of active users in the room
+        rooms.roomId.push(user);
+        // Emit the list of active users in the room to all users in the room
+        io.to(roomId).emit('activeUsers', rooms[roomId]);
       }
     })
   })
