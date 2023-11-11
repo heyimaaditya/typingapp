@@ -1,28 +1,36 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
-import {PiPencilCircleFill} from 'react-icons/pi'
-import GameModeButton from './GameModeButton'
-import {SubmitHandler,useForm} from 'react-hook-form'
-type Props={};
-type Inputs={
-  difficulty:string;
-}
-const SinglePlayerMode=(props:Props)=>{
-  const {register,handleSubmit,formState:{errors},}=useForm<Inputs>();
-  const onSubmit:SubmitHandler<Inputs>=(data)=>console.log(data);
+import GameModeButton from './GameModeButton';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { PiPencilCircleFill } from 'react-icons/pi';
+type Props = {};
+
+type Inputs = {
+  dificulty: string;
+};
+
+const SinglePlayerMode = (props: Props) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<Inputs>();
+  const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
+
   return (
-    <div className='p-6 space-y-4'>
-      <h3 className='text-2xl font-semibold lg:text-3xl'>
-        Practice your Typings{''}
+    <div className="p-6 space-y-4">
+      <h3 className="text-3xl font-semibold">
+        Practice Your Typings{' '}
         <span>
-          <PiPencilCircleFill className='inline pl-1'/>
+          <PiPencilCircleFill className="inline pl-1" />
         </span>
       </h3>
+
       <form onSubmit={handleSubmit(onSubmit)}>
         <GameModeButton mode="single" text="Start Practicing" />
       </form>
     </div>
-  )
+  );
+};
 
-}
 export default SinglePlayerMode;

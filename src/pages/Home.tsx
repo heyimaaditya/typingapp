@@ -5,23 +5,24 @@ import GlobalLeaderBoards from '../components/Home/GlobalLeaderBoards';
 import MultiplePlayerMode from '../components/Home/MultiplePlayerMode';
 import PlayWithFriendsMode from '../components/Home/PlayWithFriendsMode';
 import SinglePlayerMode from '../components/Home/SinglePlayerMode';
-const Home=(props:Props)=>{
+const Home = (props: Props) => {
   return (
-    <div className="p-6 sm:p-10">
-      <div className="grid grid-cols-1 max-w-7xl mx-auto gap-8 md:grid-cols-2">
-        <div className="grid grid-col-1 gap-6 md:grid-cols-1 lg:grid-cols-2">
-          <div className="h-full w-full shadow-md shadow-secondary bg-primary2 rounded-xl row-span-1 col-span-2">
+    <div className="min-h-screen p-10">
+      <div className="grid grid-cols-3 h-screen gap-8">
+        <div className="grid grid-cols-2 col-span-2 grid-rows-2 h-full gap-6">
+          <div className="row-span-1 col-span-2 h-full w-full shadow-md shadow-secondary bg-primary2 rounded-xl">
             <SinglePlayerMode />
           </div>
-          <div className="h-full w-full shadow-md shadow-secondary bg-primary2 rounded-xl row-span-1 col-span-2 xl:col-span-1">
+          <div className="row-span-1 col-span-1 h-full w-full shadow-md shadow-secondary bg-primary2 rounded-xl">
             <MultiplePlayerMode />
           </div>
-          <div className="h-full w-full shadow-md shadow-secondary bg-primary2 rounded-xl row-span-1 col-span-2 xl:col-span-1">
+          <div className="row-span-1 col-span-1 h-full w-full shadow-md shadow-secondary bg-primary2 rounded-xl">
             <PlayWithFriendsMode />
           </div>
         </div>
 
         <GlobalLeaderBoards />
+
       </div>
     </div>
   );
