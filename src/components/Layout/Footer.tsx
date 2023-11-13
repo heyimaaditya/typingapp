@@ -2,13 +2,39 @@
 import React from 'react';
 type Props = {};
 const Footer = (props: Props) => {
+  const footerStyle: React.CSSProperties = {
+    backgroundColor: '#3490dc',
+    color: '#f8f9fa',
+    fontSize: '0.875rem',
+  };
+
+  const containerStyle: React.CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '1rem',
+    margin: '0 auto',
+  };
+  const paragraphStyle: React.CSSProperties = {
+    textAlign: 'center',
+    paddingLeft: '1.5rem',
+    paddingRight: '1.5rem',
+    color: '#165374',
+  };
+  const blueText: React.CSSProperties = {
+    color: '#031120',
+
+  };
+
+
   return (
-    <footer className="bg-primary text-gray-50 text-sm sm:text-base">
-      <div className="container flex flex-col items-center justify-center p-4 mx-auto md:p-6 lg:flex-row divide-gray-400">
-        <p className="text-center px-6">
-          <span className="text-blue-900">Developed with ❤️ By </span>
-          <span className="font-semibold text-blue-900">Error 404: Team Not Found</span>
-          <span className="text-blue-900">© {new Date().getFullYear()} </span>
+    <footer style={footerStyle}>
+      <div style={containerStyle}>
+        <p style={paragraphStyle}>
+          <span style={blueText}>Developed with ❤️ By </span>
+          <span style={blueText}>Error 404: Team Not Found</span>
+          <span style={blueText}>© {new Date().getFullYear()} </span>
         </p>
       </div>
     </footer>

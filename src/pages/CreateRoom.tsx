@@ -35,7 +35,7 @@ const CreateRoom=(props:Props)=>{
           </form>
         </div>
         <div className="container bg-primary2 mx-auto p-4">
-        <h1 className=" text text-secondary text-center text-4xl font-bold py-4">Typing Test Instructions</h1>
+        <h1 className=" text text-secondary text-center text-4xl font-bold py-4"> Instructions to be Followed:</h1>
         <ul className="list-disc list-inside py-2">
             <li className="mb-2">Choose the difficulty level from the options provided.</li>
             <li className="mb-2">Select the desired duration for the typing test.</li>

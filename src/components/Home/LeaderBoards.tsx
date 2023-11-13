@@ -32,7 +32,7 @@ export const LeaderBoardRow = () => {
 export const GlobalLeaderBoards=(props:Props)=>{
   return (
     <div className='w-full col-span-1 rounded-xl flex-col flex py-8 items-center bg-white h-full'>
-      <h3 className="font-bold text-3xl text-primary">Global Leaderboards</h3>
+      <h3 className="font-bold text-3xl text-blue-900">Global Leaderboards</h3>
       <table className="w-full text-center table-auto">
         <thead>
           <tr>

@@ -1,4 +1,4 @@
-import React from "react";
+
 var generateRoomCode=()=>{
   var string='abcdefghijklmnopqrstuvwxyz';//string used to generate the code
   let room='';//empty string to store the generated room code

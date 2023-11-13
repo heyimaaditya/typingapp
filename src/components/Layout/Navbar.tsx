@@ -6,6 +6,7 @@ import Logo from '../../assets/logo.png'
 type Props={};
 const Navbar=(props:Props)=>{
   
+  
   return (
     <nav className='py-1 px-4 w-full bg-primary'>
       <div className="max-w-7xl flex items-center justify-between mx-auto">
@@ -21,8 +22,8 @@ const Navbar=(props:Props)=>{
                 className="w-12 h-12 rounded-lg"
               />
               <div className="flex flex-col">
-                <p className="text-white text-xl font-semibold">Guest</p>
-                <div className="flex text-sm items-center space-x-2">
+                <p className="text-yellow-900 text-xl font-semibold">Guest</p>
+                <div className="flex text-sm items-center space-x-2 text-blue-900">
                   <span>0 WPM</span>
                   <span>0 Races</span>
                 </div>
