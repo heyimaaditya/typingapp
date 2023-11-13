@@ -2,6 +2,9 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
 interface GameState {
+  wpm: any;
+  accuracy: any;
+  timer: any;
   Games: number;
   increase: (by: number) => void;
 }
