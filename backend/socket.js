@@ -1,6 +1,5 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
-import React from "react";
 module.exports=function Socket(io){
   io.on('connection',(socket)=>{
     const id=socket.id;//Fetches the unique id of the connecting socket
@@ -12,11 +11,11 @@ module.exports=function Socket(io){
     );
     const rooms={};
     //handle room creation 
-    socket.on('createRoom',({roomId,name,image})=>{
+    socket.on('createRoom',({name,image})=>{
       const roomId=generateRoomCode();
       //if the room doesn't exist create it and add creator to it
       if(!rooms[roomId]){
-        rooms[roomName]=[];//create an empty array for new room
+        rooms[roomId]=[];//create an empty array for new room
         socket.join(roomId);
         console.log(`Room ${roomId} created by ${socket.id}`);
         // Create a user object with socket ID, name, and image
@@ -24,7 +23,7 @@ module.exports=function Socket(io){
 
         // Add user to the list of active users in the room
         rooms.roomId.push(user);
-
+        socket.emit('roomCreated',roomId);
         // Emit the list of active users in the room to all users in the room
         io.to(roomId).emit('activeUsers', rooms[roomId]);
       }else{
@@ -52,6 +51,36 @@ module.exports=function Socket(io){
         rooms.roomId.push(user);
         // Emit the list of active users in the room to all users in the room
         io.to(roomId).emit('activeUsers', rooms[roomId]);
+      }
+    });
+    //handle progress
+    socket.on('progressUpdate',(data)=>{
+      const {roomId,progress}=data;
+      //broadcast the progress to all other users in the same room
+      io.to(roomId).emit('progressUpdate',{userId:socket.id,progress});
+
+
+    })
+    //handle disconnection
+    socket.on('disconnect',()=>{
+      console.log(`User with ${socket.id} disconnected`);
+      //remove the users form the list of users
+      for(const roomId in rooms){
+        const index=rooms[roomId].findIndex((user)=>user.id===socket.id);
+        if(index!==-1){
+          rooms[roomId].splice(index,1);
+          //emit the list of all active users in the room to all users in the room
+          io.to(roomId).emit('activeUsers',rooms[roomId]);
+        }
+      }
+    });
+    //handle client's request for active users in room
+    socket.on('getActiveUsers',(roomId)=>{
+      //send the list of all active users in the requested room back to client
+      if(rooms[roomId]){
+        io.to(socket.id).emit('activeUsers',rooms[roomId]);
+      }else{
+        io.to(socket.id).emit('activeUsers',[]);
       }
     })
   })
