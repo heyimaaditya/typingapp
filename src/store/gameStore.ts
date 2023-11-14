@@ -7,6 +7,7 @@ import fetchParagraphForGame from '../lib/fetchParagraphForGame';
 import calculateWordsPerMinute from '../utils/calculateAccuracyAndWPM';
 
 interface GameState {
+  [x: string]: any;
   mode: string;
   timer: number;
   duration: number;
