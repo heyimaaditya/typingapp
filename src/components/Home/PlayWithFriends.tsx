@@ -3,7 +3,7 @@ import React from 'react'
 import { AiOutlineTeam } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
 import GameModeButton from './GameMode';
-
+import {GameModes} from '../../interfaces/game.d'
 type Props = {};
 
 const PlayWithFriendsMode = (props: Props) => {
@@ -16,7 +16,7 @@ const PlayWithFriendsMode = (props: Props) => {
         </span>{' '}
       </h3>
 
-      <GameModeButton mode="friends" text="Create Room" />
+      <GameModeButton mode={GameModes.WITH_FRIENDS} text="Create Room" />
     </div>
   );
 };

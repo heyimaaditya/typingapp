@@ -1,10 +1,10 @@
-import User from './user'
+import {User} from './user'
 export enum GameStatus{
   WAITING,
   PLAYING,
   FINISHED,
 }
-export interface Player extends User {
-  wpm: number;
-  accuracy: number;
+export interface Player extends User{
+  wpm:number;
+  accuracy:number;
 }

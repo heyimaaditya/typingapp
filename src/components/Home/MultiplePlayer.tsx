@@ -1,7 +1,7 @@
 import React from 'react';
 import { BsGlobeAmericas } from 'react-icons/bs';
 import GameModeButton from './GameMode';
-
+import {GameModes} from '../../interfaces/game.d'
 type Props = {};
 
 const MultiplePlayerMode = (props: Props) => {
@@ -13,7 +13,7 @@ const MultiplePlayerMode = (props: Props) => {
           <BsGlobeAmericas className="inline pl-1" />
         </span>{' '}
       </h3>
-      <GameModeButton mode="online" text="Join Game" />
+      <GameModeButton mode={GameModes.ONLINE} text="Join Game" />
     </div>
   );
 };
