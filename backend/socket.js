@@ -12,17 +12,18 @@ module.exports=function Socket(io){
       const roomId=generateRoomCode();
       const existingRoom=await db.collection('rooms').doc(roomId).get();
       if(!existingRoom.exists){
-        await db.collection('rooms').doc(roomId).set({});
+        await db.collection('rooms').doc(roomId).set({owner:socket.id});
         console.log(`Room ${roomId} created by ${socket.id}`);
         socket.join(roomId);
     
         //store user data with socket.id as as the document key
-        await db.collection('rooms').doc(roomId).collection('users').doc(socket.id).set(user);
+        await db.collection('rooms').doc(roomId).collection('users').doc(socket.id).set(user).set({socketId:socket.id,...user});
         const usersSnapshot=await db.collection('rooms').doc(roomId).collection('users').get();
         const users=usersSnapshot.docs.map((doc)=>doc.data());
         socket.emit('roomCreated',roomId);
         //emit the list of active users in the room
         io.to(roomId).emit('activeUsers',users);
+        io.to(roomId).emit('setOwner',socket.id);
 
       }else{
         //room with this id already exist
@@ -59,13 +60,20 @@ module.exports=function Socket(io){
           //update the list of all active users in room 
           const updateUsersSnapshot=await db.collection('rooms').doc(roomId).collection('users').get();
           const updateUsers=updateUsersSnapshot?.docs?.map((doc)=>doc?.data());
+          const owner=await (await db.collection('rooms').doc(roomId).get()).data().owner;
+          console.log(owner);
           //emit the list of all active users to all users in the room
           io.to(roomId).emit('activeUsers',updateUsers);
+          io.to(roomId).emit('setOwner',owner)
         }  
         
 
       }
     });
+    socket.on('game-status',(data)=>{
+      const {roomId,status}=data;
+      io.to(roomId).emit('game-status',{status});
+    })
     //handle progress update
     socket.on('progressUpdate',(data)=>{
       const {roomId,progress}=data;

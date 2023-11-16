@@ -6,7 +6,13 @@ import { GameStatus, GameModes } from '../interfaces/game.d';
 import fetchParagraphForGame from '../lib/fetchParagraphForGame';
 import calculateWordsPerMinute from '../utils/calculateAccuracyAndWPM';
 import { User } from 'firebase/auth';
-
+interface ExtendedUser extends User{
+  socketId:string,
+  progress:{
+    wpm:number|0;
+    accuracy:number|0;
+  }
+}
 interface GameState {
   mode: GameModes;
   timer: number;
@@ -18,10 +24,11 @@ interface GameState {
   wpm: number;
   typed: string;
   accuracy: number;
-  players: User[];
+  players: ExtendedUser[];
   correctWordsArray: string[];
   incorrectWordsArray: string[];
-  setPlayers: (players: User[]) => void;
+  owner:string|null;
+  setPlayers: (players: ExtendedUser[]) => void;
   setTyped: (typed: string) => void;
   setMode: (mode: GameModes) => void;
   startGame: () => void;
@@ -30,6 +37,8 @@ interface GameState {
   decrementTimer: () => void;
   setGameStatus: (gameStatus: GameStatus) => void;
   setRoomId:(roomId:string)=>void;
+  setOwner:(owner:string)=>void;
+  updateProgress:(userId:string,progress:any)=>void;
 }
 const useGameStore = create<GameState>()(
   devtools((set, get) => ({
@@ -47,13 +56,24 @@ const useGameStore = create<GameState>()(
     correctWordsArray: [],
     incorrectWordsArray: [],
     roomId:null,
+    owner:null,
+    setOwner:(owner)=>set({owner})
     setRoomId:(roomId)=>set({roomId}),
 
     setPlayers: (players) => set({ players }),
 
     setGameStatus: (gameStatus) => set({ gameStatus }),
-
-    setTyped: (typed) => {
+    updateProgress:(userId,progress)=>{
+      const players=get()?.players?.map((player)=>{
+        if(player?.socketId===userId){
+          return {
+            ...player,
+            progress,
+          }
+        };
+        return player;
+      })
+    }setTyped: (typed) => {
       set({ typed });
       
       
@@ -63,6 +83,17 @@ const useGameStore = create<GameState>()(
         correctWordsArray,
         incorrectWordsArray,
       } = calculateWordsPerMinute(get().paragraph!, typed, get().duration / 60);
+      if(get().mode===GameModes.WITH_FRIENDS){
+        socket.emit('progressUpdate',{
+          roomId:get().roomId,
+          progress:{
+            wpm:wordsPerMinute,
+            accuracy,
+          }
+
+
+        })
+      }
 
       set({
         wpm: wordsPerMinute,
@@ -74,6 +105,11 @@ const useGameStore = create<GameState>()(
 
     startGame: async () => {
       set({ loading: 'Generating a paragraph for you! Please Wait....' });
+      socket.emit('game-status',{
+        status:GameStatus.PLAYING,
+        roomId:get().roomId,
+        
+      })
       const response = await fetchParagraphForGame(
         get().difficulty,
         get().duration
