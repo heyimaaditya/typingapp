@@ -1,33 +1,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from "react";
-import useGameStore from "../store/gameStore";
-import { GameStatus } from "../interfaces/game";
-import WaitingScreen from "../components/Game/WaitingScreen";
-import Status from "../components/Game/Status";
-import { toast } from "react-toastify";
-import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
 import { motion } from "framer-motion";
-import e from "express";
-type Props={}
+import useGameStore from "../store/gameStore";
+import useUserStore from "../store/useUserStore";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { GameStatus } from "../interfaces/game.d";
+import WaitingScreen from "../components/Game/WaitingScreen";
+import { toast } from "react-toastify";
+import Status from "../components/Game/Status";
+type Props={
+
+};
 const Game=(props:Props)=>{
   const {state}=useLocation();
-  const [
-    decrementTimer,
-    timer,
-    setDuration,
-    setMode,
-    paragraph,
-    gameStatus,
-    loading,
-    duration,
-    typed,
-    setTyped,
-    endGame,
-    setGameStatus,
-
-  ]=useGameStore((state)=>[
+  const [decrementTimer,timer,setDuration,setMode,paragraph,gameStatus,loading,duration,typed,setTyped,endGame,setGameStatus,correctWordsArray,incorrectWordsArray,setPlayers,]=useGameStore((state)=>[
     state.decrementTimer,
     state.timer,
     state.setDuration,
@@ -35,12 +23,13 @@ const Game=(props:Props)=>{
     state.paragraph,
     state.gameStatus,
     state.loading,
-    state.duration,
     state.typed,
     state.setTyped,
     state.endGame,
     state.setGameStatus,
-
+    state.correctWordsArray,
+    state.incorrectWordsArray,
+    state.setPlayers,
   ]);
   useEffect(()=>{
     if(loading){
@@ -60,7 +49,7 @@ const Game=(props:Props)=>{
       setTimeout(()=>{
         decrementTimer();
       },1000);
-    }else if(gameStatus===GameStatus.PLAYING&&timer===0){
+    }else if(gameStatus===GameStatus.PLAYING && timer===0){
       endGame();
     }
     return ()=>{};
@@ -68,43 +57,45 @@ const Game=(props:Props)=>{
   useEffect(()=>{
     setDuration(state.duration*60);
     setMode(state.mode);
+    setPlayers(state.players);
     return ()=>{};
-
-  },[state,setDuration,setMode]);
+  },[state,setDuration,setMode,setPlayers]);
   const handleChange=(e:any)=>{
-    const {value}:e.target;
+    const {value}=e.target;
     setTyped(value);
-  }
-  useEffect(() => {
-    return () => {
-      setGameStatus(GameStatus.WAITING);
-    };
-  }, []);
 
+  };
+  useEffect(()=>{
+    return ()=>{
+      setGameStatus(GameStatus.WAITING);
+    }
+  },[]);
+  const [user]=useUserStore((state)=>[state.user]);
   return (
     <div className="p-10 relative">
-      <motion.div style={{ scaleX: timer / duration }}
-        className="absolute top-0 h-2 w-full bg-secondary left-0"
-      />
-       <div className="w-full flex items-center justify-center p-10 bg-primary2 rounded-xl">
-        {gameStatus === GameStatus.PLAYING ? (
+      <motion.div className="absolute top-0 left-0 h-2 w-full bg-secondary" style={{scaleX:timer/duration}}/>
+      <div className="w-full flex items-center justify-center p-10 bg-primary2 rounded-xl">
+        {gameStatus===GameStatus.PLAYING?(
           <div className="space-y-4">
-            <Status />
-            <p className="text-base text-white">{paragraph}</p>
-            <textarea
-              placeholder="Type the text here..."
-              onChange={handleChange}
-              rows={8}
-              value={typed}
-              className="w-full outline-none border-none text-black p-2 rounded-xl"
-            ></textarea>
+            <Status/>
+            <p className="text-base w-full space-x-2 unselectable text-white">
+              {paragraph?.split(' ').map((word,idx)=>{
+                return (
+                  <span key={idx} className={`${correctWordsArray.includes(word)?'text-green-500':'text-white'}`}>
+                    {word}
+                  </span>
+                )
+              })}
+            </p>
+            <textarea placeholder="Type Text here....." onChange={handleChange} rows={8} value={typed} className="w-full outline-none border-none text-black p-2 rounded-xl"></textarea>
           </div>
-        ) : null}
-
+        ):null}
         {gameStatus === GameStatus.WAITING ? <WaitingScreen /> : null}
         {gameStatus === GameStatus.FINISHED ? <WaitingScreen /> : null}
       </div>
     </div>
-  );
+  )
+  
+
 };
 export default Game;
