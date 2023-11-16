@@ -82,6 +82,7 @@ module.exports=function Socket(io){
       const snapshot=await roomsRef.where(`users.${socketId}`,'!=',null);
       snapshot.forEach(async(doc)=>{
         const roomId=doc.id;
+        console.log(roomId);
         //remove user from disconnection
         await db.collection('rooms').doc(roomId).collection('users').doc(socketId).delete();
         //get the updated list of all active users in the room
