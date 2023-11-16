@@ -86,4 +86,38 @@ module.exports=function Socket(io){
       }
     });
   });
+  //joi online request handle
+  //first define an array of rooms,here each rooms will be an object of duration and roomId
+  const onlineRooms=[];
+  //handle room join request
+  socket.on('joinRoom',({difficulty,duration})=>{
+    //check if a room with same duration and difficulty exist or not
+    const existingRoom=onlineRooms.find((onlineRooms)=>onlineRooms.difficulty===difficulty && onlineRooms.duration===duration);
+    if(existingRoom&&existingRoom.participants.length<existingRoom.size){
+      //if there is an available room with available slots then add user to it
+      existingRoom.participants.push(socket.id);
+      socket.join(existingRoom.id);
+      io.to(existingRoom.id).emit('roomJoined',{room:existingRoom});
+    }else{
+      //if there is no available rooms,then create a new room
+      const newRoom={
+        id:socket.id,
+        difficulty,
+        duration,
+        size:6,
+        participants:[socket.id],
+      }
+      rooms.push(newRoom);
+      socket.join(newRoom.id);
+      io.to(newRoom.id).emit('roomJoined',{room:newRoom});
+    }
+  })
+  //handle disconnection
+  socket.on('disconnect',()=>{
+    console.log('disconnected');
+    //remove the disconnected user from all rooms
+    rooms.forEach((room)=>{
+      room.participants=room.participants.filter((participant)=>participant!==socket.id);
+    })
+  })
 };
