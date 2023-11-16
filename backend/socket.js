@@ -23,7 +23,7 @@ module.exports=function Socket(io){
         socket.emit('roomCreated',roomId);
         //emit the list of active users in the room
         io.to(roomId).emit('activeUsers',users);
-        io.to(roomId).emit('setOwner',socket.id);
+        //io.to(roomId).emit('setOwner',socket.id);
 
       }else{
         //room with this id already exist
@@ -61,7 +61,7 @@ module.exports=function Socket(io){
           const updateUsersSnapshot=await db.collection('rooms').doc(roomId).collection('users').get();
           const updateUsers=updateUsersSnapshot?.docs?.map((doc)=>doc?.data());
           const owner=await (await db.collection('rooms').doc(roomId).get()).data().owner;
-          console.log(owner);
+          //console.log(owner);
           //emit the list of all active users to all users in the room
           io.to(roomId).emit('activeUsers',updateUsers);
           io.to(roomId).emit('setOwner',owner)
@@ -70,15 +70,15 @@ module.exports=function Socket(io){
 
       }
     });
-    socket.on('game-status',(data)=>{
-      const {roomId,status}=data;
-      io.to(roomId).emit('game-status',{status});
+    socket.on('gameStatus',(data)=>{
+      const {roomId,status,timer,paragraph}=data;
+      console.log(`Room ${roomId} game sttaus changes to ${status}`)
+      io.to(roomId).emit('gameStatus',{status,timer,paragraph});
     })
     //handle progress update
-    socket.on('progressUpdate',(data)=>{
-      const {roomId,progress}=data;
-      //broadcast the progress to all active users in same room
-      io.to(roomId).emit('progressUpdate',{userId:socket.id,progress});
+    socket.on('progressUpdate',({roomId,progress})=>{
+     
+      io.to(roomId).emit('progressUpdate',{socketId:socket.id,progress});
 
 
     });
@@ -87,7 +87,8 @@ module.exports=function Socket(io){
       console.log(`User with ${socketId} disconnected`);
       //find the room where user was located
       const roomsRef=db.collection('rooms');
-      const snapshot=await roomsRef.where(`users.${socketId}`,'!=',null);
+      const snapshot=await roomsRef.where(`users.${socketId}`,'==',socketId);
+      console.log(snapshot.forEach((doc)=>doc.data()));
       snapshot.forEach(async(doc)=>{
         const roomId=doc.id;
         console.log(roomId);
@@ -97,7 +98,13 @@ module.exports=function Socket(io){
         const roomUsersSnapshot=await db.collection('rooms').doc(roomId).collection('users').get();
         const updateUsers=roomUsersSnapshot.docs.map((doc)=>doc.data());
         //emit the list of all active users in the same room
-        io.to(roomId).emit('activeUsers',updateUsers);
+        
+        if(updateUsers.length===0){
+          //if there is no user in entire room delete it
+          await db.collection('rooms').doc(roomId).delete();
+        }else{
+          io.to(roomId).emit('activeUsers',updateUsers);
+        }
 
       })
     };

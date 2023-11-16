@@ -1,7 +1,7 @@
 /* eslint-disable no-global-assign */
 const express=require('express');
 const app=express();
-const cookieParser=require('cookie-parser');
+//const cookieParser=require('cookie-parser');
 
 //code for CORS(croos-origin resource sharing)
 //defining a middleware 'allowcrossdomain' which handle req,res and next (middleware function) 
