@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
+const findRoomIdBySocketId = require('./lib/getRoomIdBySocketId');
 const {db}=require('./utils/firebase');
 const {generateRoomCode}=require('./utils/generateRoomCode');
 module.exports=function Socket(io){
@@ -17,13 +18,10 @@ module.exports=function Socket(io){
         socket.join(roomId);
     
         //store user data with socket.id as as the document key
-        await db.collection('rooms').doc(roomId).collection('users').doc(socket.id).set(user).set({socketId:socket.id,...user});
-        const usersSnapshot=await db.collection('rooms').doc(roomId).collection('users').get();
-        const users=usersSnapshot.docs.map((doc)=>doc.data());
+       
         socket.emit('roomCreated',roomId);
         //emit the list of active users in the room
-        io.to(roomId).emit('activeUsers',users);
-        //io.to(roomId).emit('setOwner',socket.id);
+        
 
       }else{
         //room with this id already exist
@@ -70,6 +68,39 @@ module.exports=function Socket(io){
 
       }
     });
+    try {
+      await db
+        .collection('rooms')
+        .doc(roomId)
+        .collection('users')
+        .doc(socket.id)
+        .delete();
+    } catch (error) {
+      console.error(error);
+    }
+
+      console.log(`${socket.id} left room ${roomId}`);
+
+      try {
+        const roomUsersSnapshot = await db
+          .collection('rooms')
+          .doc(roomId)
+          .collection('users')
+          .get();
+
+        const updatedUsers = roomUsersSnapshot.docs.map((doc) => doc.data());
+
+        if (updatedUsers.length === 0) {
+          // If there are no users left in the room, delete the entire room
+          await db.collection('rooms').doc(roomId).delete();
+        } else {
+          // If there are still users in the room, emit the updated list of users
+          io.to(roomId).emit('activeUsers', updatedUsers);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    });
     socket.on('gameStatus',(data)=>{
       const {roomId,status,timer,paragraph}=data;
       console.log(`Room ${roomId} game sttaus changes to ${status}`)
@@ -86,27 +117,41 @@ module.exports=function Socket(io){
     const handleDisconnect=async(socketId)=>{
       console.log(`User with ${socketId} disconnected`);
       //find the room where user was located
-      const roomsRef=db.collection('rooms');
-      const snapshot=await roomsRef.where(`users.${socketId}`,'==',socketId);
-      console.log(snapshot.forEach((doc)=>doc.data()));
-      snapshot.forEach(async(doc)=>{
-        const roomId=doc.id;
-        console.log(roomId);
-        //remove user from disconnection
-        await db.collection('rooms').doc(roomId).collection('users').doc(socketId).delete();
-        //get the updated list of all active users in the room
-        const roomUsersSnapshot=await db.collection('rooms').doc(roomId).collection('users').get();
-        const updateUsers=roomUsersSnapshot.docs.map((doc)=>doc.data());
-        //emit the list of all active users in the same room
-        
-        if(updateUsers.length===0){
-          //if there is no user in entire room delete it
-          await db.collection('rooms').doc(roomId).delete();
-        }else{
-          io.to(roomId).emit('activeUsers',updateUsers);
-        }
+      const roomId = await findRoomIdBySocketId(socketId, db);
 
-      })
+      try {
+        await db
+          .collection('rooms')
+          .doc(roomId)
+          .collection('users')
+          .doc(socket.id)
+          .delete();
+      } catch (error) {
+        console.error(error);
+      }
+
+      console.log(`${socket.id} left room ${roomId}`);
+
+      // Get the updated list of active users in the room
+      try {
+        const roomUsersSnapshot = await db
+          .collection('rooms')
+          .doc(roomId)
+          .collection('users')
+          .get();
+
+        const updatedUsers = roomUsersSnapshot.docs.map((doc) => doc.data());
+
+        if (updatedUsers.length === 0) {
+          // If there are no users left in the room, delete the entire room
+          await db.collection('rooms').doc(roomId).delete();
+        } else {
+          // If there are still users in the room, emit the updated list of users
+          io.to(roomId).emit('activeUsers', updatedUsers);
+        }
+      } catch (error) {
+        console.error(error);
+      }
     };
     //set up disconnection listener
     socket.on('disconnect',()=>{
