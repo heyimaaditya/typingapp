@@ -20,6 +20,10 @@ const WaitingScreen=(props:Props)=>{
     state.mode,
     
   ])
+  const handleCopy=()=>{
+    navigator.clipboard.writeText(`http:localhost:3000/game?roomId=${roomId}`);
+    toast.success('Copied Room Id to clipboard, Share with Your Friends');
+  }
   
   return (
     <div className="w-full flex items-center justify-center flex-col space-y-4">

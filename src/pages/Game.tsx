@@ -6,7 +6,7 @@ import useGameStore from "../store/gameStore";
 import useUserStore from "../store/useUserStore";
 import { useEffect } from "react";
 import { useLocation ,useSearchParams} from "react-router-dom";
-import { GameStatus } from "../interfaces/game.d";
+import { GameStatus,GameModes } from "../interfaces/game.d";
 import WaitingScreen from "../components/Game/WaitingScreen";
 import { toast } from "react-toastify";
 import Status from "../components/Game/Status";
@@ -85,6 +85,7 @@ const Game=(props:Props)=>{
 
   useEffect(() => {
     if (params.get('roomId') && user) {
+      setMode(GameModes.WITH_FRIENDS);
       setRoomId(params.get('roomId')!);
       socket.emit('joinRoom', { roomId: params.get('roomId'), user: user });
     }
@@ -110,7 +111,7 @@ const Game=(props:Props)=>{
             <textarea placeholder="Type Text here....." onChange={handleChange} rows={8} value={typed} className="w-full outline-none border-none text-black p-2 rounded-xl"></textarea>
           </div>
         ):null}
-        <WaitingScreen/>
+        {gameStatus!==GameStatus.PLAYING && <WaitingScreen/>}
       </div>
     </div>
   )

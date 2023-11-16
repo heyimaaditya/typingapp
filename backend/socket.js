@@ -44,20 +44,21 @@ module.exports=function Socket(io){
         const roomData=existingRoom.data();
         const roomUsersSnapshot=await db.collection('rooms').doc(roomId).collection('users').get();
         const roomUsers=roomUsersSnapshot.docs.map((doc)=>doc.data());
-        socket.join(roomId);
+        
         if(roomUsers.length>=6){
           //room is already full//
           socket.emit('roomError','Room is already full');
 
         }else{
           //add the particpant to room
-          if(!roomUsers.some((u)=>u.id===user.id)){
+          if(!roomUsers.some((u)=>u.socketId===socket.id)){
             await db.collection('rooms').doc(roomId).collection('users').doc(socket.id).set(user);
+            socket.join(roomId);
             console.log(`${socket.id} joined room ${roomId}`);
           }
           //update the list of all active users in room 
           const updateUsersSnapshot=await db.collection('rooms').doc(roomId).collection('users').get();
-          const updateUsers=updateUsersSnapshot.docs.map((doc)=>doc.data());
+          const updateUsers=updateUsersSnapshot?.docs?.map((doc)=>doc?.data());
           //emit the list of all active users to all users in the room
           io.to(roomId).emit('activeUsers',updateUsers);
         }  
