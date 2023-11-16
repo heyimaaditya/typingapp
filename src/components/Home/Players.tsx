@@ -12,7 +12,8 @@ import {GiQueenCrown} from 'react-icons/gi'
 import {MdOutlineContentCopy} from 'react-icons/md'
 import useGame from '../../hooks/useGame';
 import {ExtendedUser} from '../../interfaces/user';
-import useUserStore from '../../store/useUserStore';
+import useUserStore from '../../store/userStore';
+//import useUserStore from '../../store/useUserStore';
 type Props = {
   player: ExtendedUser;
   delayIdx: number;
@@ -23,6 +24,7 @@ const PlayerCard = ({ player, delayIdx }: Props) => {
   const [owner]=useGameStore((state)=>[state.owner])
   
   const [gameStatus,progress,soloWpm,soloAccuracy,mode] = useGameStore((state) => [state.gameStatus,state.updateProgress,state.soloWpm,state.soloAccuracy,state.mode]);
+  const [currentUsersSocketId] = useUserStore((state) => [state.socketId]);
 
   const { photoURL,displayName ,stats,socketId} = player;
   const {averageWpm,races}=stats||{averageWpm:0,races:0};
@@ -38,8 +40,9 @@ const PlayerCard = ({ player, delayIdx }: Props) => {
           delay: delayIdx * 0.2,
         },
       }}
-      className="flex w-28 flex-col items-center justify-center m-8 text-center"
-    >
+      className={`flex ${
+        currentUsersSocketId === socketId ? 'border-2 border-secondary' : ''
+      } max-w-xs flex-col items-center justify-center p-4 rounded-lg px-8 text-center`}>
       <div className="relative w-fit">
         {socketId===owner?(
           <div className='absolute bg-secondary rounded-full flex items-center justify-center w-5 h-5 top-0 right-2'>
@@ -51,12 +54,12 @@ const PlayerCard = ({ player, delayIdx }: Props) => {
       <p className='text-base sm:text-xl font-semibold leadi'>{displayName}</p>
       {gameStatus===GameStatus.FINISHED||GameStatus.PLAYING?(
       
-        <div className="">
-          <p className="dark:text-gray-400">WPM:{wpm}</p>
-          <p className="dark:text-gray-400">Accuracy:{accuracy}</p>
+      <div className="text-xs">
+      <p className="text-gray-400">WPM: {wpm}</p>
+      <p className="text-gray-400">Accuracy: {accuracy}</p>
         </div>
       ) : (
-        <div className="">
+        <div className="text-xs">
           <p className="dark:text-gray-400 whitespace-nowrap">Average WPM:{averageWpm}</p>
           <p className="dark:text-gray-400 whitespace-nowrap">Races:{races}</p>
         </div>
@@ -68,6 +71,7 @@ const PlayerCard = ({ player, delayIdx }: Props) => {
 const Players = () => {
   const [players] = useGameStore((state) => [state.players]);
   const [mode,roomId]=useGameStore((state)=>[state.mode,state.roomId]);
+  const [progress] = useGameStore((state) => [state.progress]);
   const handleCopy=()=>{
     navigator.clipboard.writeText(`http:localhost:3000/game?roomId=${roomId}`);
     toast.success('Copied Room Id to clipboard ,share with your friends');
@@ -86,9 +90,21 @@ const Players = () => {
       
       )}
       <div className='flex flex-wrap items-center justify-center'>
-        {players?.map((players,idx)=>(
-          <PlayerCard delayIdx={idx} player={players}/>
-        ))}
+      {mode === GameModes.SINGLE_PLAYER
+          ? players.map((players, idx) => (
+              <PlayerCard delayIdx={idx} player={players} />
+            ))
+          : players
+              .sort((player1, player2) => {
+                return progress.get(player2.socketId)?.wpm ||
+                  0 > progress.get(player1.socketId)?.wpm! ||
+                  0
+                  ? 1
+                  : -1;
+              })
+              ?.map((players, idx) => (
+                <PlayerCard key={idx} delayIdx={idx} player={players} />
+              ))}
       </div>
     </div>
   );

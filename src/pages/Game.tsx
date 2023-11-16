@@ -12,6 +12,8 @@ import { toast } from "react-toastify";
 import Status from "../components/Game/Status";
 import { socket } from "../utils/socket";
 import Players from "../components/Home/Players";
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { ExtendedUser } from '../interfaces/user';
 type Props={
 
 };
@@ -20,9 +22,10 @@ const Game=(props:Props)=>{
   const [params]=useSearchParams();
   const [user]=useUserStore((state)=>[state.user]);
   
-  const [decrementTimer,timer,setMode,paragraph,gameStatus,loading,duration,typed,setTyped,endGame,setGameStatus,correctWordsArray,incorrectWordsArray,setPlayers,setRoomId,setOwner,mode,setProgress,setTimer,setParagraph]=useGameStore((state)=>[
+  const [decrementTimer,timer,setMode,paragraph,gameStatus,loading,duration,typed,setTyped,endGame,setGameStatus,correctWordsArray,incorrectWordsArray,setPlayers,setRoomId,setOwner,mode,setProgress,setTimer,setParagraph,roomId]=useGameStore((state)=>[
     state.decrementTimer,
     state.timer,
+    state.roomId,
     //state.setDuration,
     state.setMode,
     state.paragraph,
@@ -57,8 +60,9 @@ const Game=(props:Props)=>{
   },[loading]);
   useEffect(()=>{
     if(gameStatus===GameStatus.PLAYING){
-      if(timer===0) endGame();
-      else{
+      if (timer === 0) {
+        endGame(user as ExtendedUser);
+      } else {
         setTimeout(()=>{
           decrementTimer();
         },1000);
@@ -70,9 +74,11 @@ const Game=(props:Props)=>{
  
   useEffect(()=>{
     return ()=>{
+      console.log(roomId);
+      if (roomId) socket.emit('exitRoom', roomId);
       setGameStatus(GameStatus.WAITING);
     }
-  },[setGameStatus]);
+  },[setGameStatus,roomId]);
   useEffect(() => {
     socket.on('activeUsers', (users) => {
      // console.log(users);
@@ -90,7 +96,13 @@ const Game=(props:Props)=>{
     socket.on('progressUpdate',({socketId,progress})=>{
       setProgress(socketId,progress)
     })
+    socket.on('roomError', (error) => {
+      toast.error(error);
+    });
+
     return ()=>{
+      //setPlayers([]);
+      //socket.emit('exitRoom', roomId);
       socket.off('activeUsers');
       socket.off('setOwner');
       socket.off('gameStatus');
@@ -104,11 +116,25 @@ const Game=(props:Props)=>{
     if(params.get('roomId')){
       setRoomId(params.get('roomId'));
       setMode(GameModes.WITH_FRIENDS);
-      socket.emit('joinRoom',{
-        roomId:params.get('roomId'),
-        user:user,
+      const auth = getAuth();
 
-      })
+      const listener = onAuthStateChanged(auth, async (firbaseUser) => {
+        if (firbaseUser)
+          socket.emit('joinRoom', {
+            roomId: params.get('roomId'),
+            user: firbaseUser,
+          });
+        else {
+          socket.emit('joinRoom', {
+            roomId: params.get('roomId'),
+            user: user,
+          });
+        }
+
+      });
+      return () => {
+        listener();
+      };
     }
   },[user,params,setRoomId,setMode]);
 

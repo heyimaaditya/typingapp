@@ -7,11 +7,12 @@ import dummyImage from '../assets/Dummy Profile.png'
 import { ExtendedUser,InitialUser } from "../interfaces/user";
 interface UserState{
   socketId:string|null;
-  token:string|null;
+  //token:string|null;
   user:ExtendedUser|InitialUser;
   setSocketId: (socketId: string | null) => void;
   signInUser:()=>void;
   signOutUser:()=>void;
+  setName: (name: string) => void;
 
 }
 const initialUser: InitialUser = {
@@ -23,43 +24,61 @@ const initialUser: InitialUser = {
   },
 };
 
-const useUserStore=create<UserState>()(
-  /*wraps the store with devtools for debugging purpose*/
-  devtools((set,get)=>({
-    user:initialUser,
-    token:null,
-    socketId:null,
-    setSocketId:(socketId)=>{
-      set({socketId});
-    }
-  },
-    /*wraps the store with persistence midlleware to save changes*/
+const useUserStore = create<UserState>()(
+  devtools(
+    // persist(
+
+    persist(
+      (set, get) => ({
+        user: initialUser,
+        socketId: null,
+
+     
+        setUser: (user) => {
+          set({ user });
+        },
+
+        setSocketId: (socketId) => {
+          set({ socketId });
+        },
+
+      
+        setName: (name) => {
+          set((state) => ({ user: { ...state.user, displayName: name! } }));
+        },
+
     
-        //sign-in process using firebase
-  signInUser:async()=>{
-          /*initiates the firebase authentication process with google authentication retreiving user data and acces token */
-    await signInWithPopup(auth,provider).then((result)=>{
-      const credential=GoogleAuthProvider.credentialFromResult(result);
-      const token=credential!.accessToken;
-      const user=result.user;
-      set({user,token});
+        signInUser: async () => {
+          await signInWithPopup(auth, provider)
+            .then((result) => {
+              const credential =
+                GoogleAuthProvider.credentialFromResult(result);
+              const user = result.user as ExtendedUser;
 
-    }).catch((error)=>{
-    const errorCode=error.code;
-    const errorMessage=error.message;
-    const email=error.customData.email;
-    const credential=GoogleAuthProvider.credentialFromError(error);
-    console.error(errorCode,errorMessage,email,credential)
+    
+              set({ user });
+            })
+            .catch((error) => {
+              const errorCode = error.code;
+              const errorMessage = error.message;
+              const email = error.customData.email;
+              const credential = GoogleAuthProvider.credentialFromError(error);
+              console.error(errorCode, errorMessage, email, credential);
+            });
+        },
 
-    })
-  },
-        /*sign-out process using firebase*/
-  signOutUser:async()=>{
-    await signOut(auth);
-    set({user:null,token:null});
-    useUserStore.persist.clearStorage();
+        signOutUser: async () => {
+          await signOut(auth);
+          set({ user: initialUser });
+        },
+      }),
+      {
+        name: 'user-storage',
+        getStorage: () => localStorage,
+        partialize: (state) => ({ user: state.user }),
+      }
+    )
+  )
+);
 
-    }
-  }))
-)
 export default useUserStore;

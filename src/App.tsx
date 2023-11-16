@@ -8,11 +8,28 @@ import { socket } from './utils/socket';
 import GameSettings from './pages/GameSettings';
 import Game from './pages/Game'
 import useUserStore from './store/useUserStore';
+import useGameStore from './store/gameStore';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { ExtendedUser } from './interfaces/user';
 //import { useEffect } from 'react';
 //import useGameStore from './store/gameStore';
 function App(){
   const [setSocketId]=useUserStore((state)=>[state.setSocketId]);
   //const [setPlayers]=useGameStore((state)=>[state.setPlayers]);
+  const [roomId] = useGameStore((state) => [state.roomId]);
+  const [setUser] = useUserStore((state) => [state.setUser]);
+
+  useEffect(() => {
+    const auth = getAuth();
+
+    const listener = onAuthStateChanged(auth, async (user) => {
+      if (user !== null) setUser(user as ExtendedUser);
+    });
+
+    return () => {
+      listener();
+    };
+  }, []);
 
   useEffect(() => {
     function onConnect() {
