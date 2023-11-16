@@ -2,12 +2,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-
+import dummyProfile from '../../assets/Dummy Profile.png'
 import { GameStatus, Player } from '../../interfaces/game.d';
 import useGameStore from '../../store/gameStore';
+import { User } from 'firebase/auth';
 
 type Props = {
-  player: Player;
+  player: User;
   delayIdx: number;
 };
 
@@ -16,7 +17,7 @@ const PlayerCard = ({ player, delayIdx }: Props) => {
   
   const [gameStatus] = useGameStore((state) => [state.gameStatus]);
 
-  const { image, wpm, name, accuracy, averageWpm, races } = player;
+  const { photoURL,displayName } = player;
   return (
     <motion.div
       animate={{
@@ -33,11 +34,11 @@ const PlayerCard = ({ player, delayIdx }: Props) => {
         alt=""
         className="self-center flex-shrink-0 w-24 h-24 mb-4 bg-center bg-cover rounded-full dark:bg-gray-500"
       
-        src={image}
+        src={photoURL||dummyProfile}
       />
-      <p className="text-xl font-semibold leadi">{name}</p>
+      <p className="text-xl font-semibold leadi">{displayName}</p>
       
-      {gameStatus === GameStatus.FINISHED ? (
+      {/*{gameStatus === GameStatus.FINISHED ? (
         <div className="">
           <p className="dark:text-gray-400">{wpm}</p>
           <p className="dark:text-gray-400">{accuracy}</p>
@@ -47,7 +48,7 @@ const PlayerCard = ({ player, delayIdx }: Props) => {
           <p className="dark:text-gray-400">Average WPM: {averageWpm}</p>
           <p className="dark:text-gray-400">Races: {races}</p>
         </div>
-      )}
+      )}*/}
     </motion.div>
   );
 };

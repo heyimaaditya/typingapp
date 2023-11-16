@@ -12,12 +12,13 @@ type Props={
   roomId:string,
 };
 const WaitingScreen=(props:Props)=>{
-  const [startGame,loading,gameStatus,mode,owner]=useGameStore((state)=>[
+  const [startGame,loading,gameStatus,roomId,mode]=useGameStore((state)=>[
     state.startGame,
     state.loading,
     state.gameStatus,
+    state.roomId,
     state.mode,
-    state.owner,
+    
   ])
   
   return (

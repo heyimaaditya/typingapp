@@ -12,4 +12,4 @@ const app = initializeApp({
 const db = admin.firestore();
 const bucket = getStorage().bucket();
 
-module.export ={ bucket, app, db };
+module.exports ={ bucket, app, db };
