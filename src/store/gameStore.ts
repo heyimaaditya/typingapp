@@ -2,28 +2,25 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
-import { GameStatus, GameModes } from '../interfaces/game.d';
+//import { GameStatus, GameModes } from '../interfaces/game.d';
 import fetchParagraphForGame from '../lib/fetchParagraphForGame';
 import calculateWordsPerMinute from '../utils/calculateAccuracyAndWPM';
-import { User } from 'firebase/auth';
-interface ExtendedUser extends User{
-  socketId:string,
-  progress:{
-    wpm:number|0;
-    accuracy:number|0;
-  }
-}
+import { GameDifficulties,GameDuration,GameModes,GameStatus,Progress } from '../interfaces/game';
+//import { User } from 'firebase/auth';
+import { ExtendedUser } from '../interfaces/user';
+
 interface GameState {
   mode: GameModes;
   timer: number;
-  duration: number;
-  difficulty: string;
+  duration: GameDuration;
+  difficulty: GameDifficulties;
   loading: string | null;
   paragraph: string | null;
   gameStatus: GameStatus;
   wpm: number;
   typed: string;
   accuracy: number;
+  progress:Map<string,Progress>;
   players: ExtendedUser[];
   correctWordsArray: string[];
   incorrectWordsArray: string[];
@@ -32,20 +29,24 @@ interface GameState {
   setTyped: (typed: string) => void;
   setMode: (mode: GameModes) => void;
   startGame: () => void;
+  setDifficulty:(mode:GameDifficulties)=>void;
   endGame: () => void;
-  setDuration: (duration: number) => void;
+  setDuration: (duration: GameDuration) => void;
   decrementTimer: () => void;
   setGameStatus: (gameStatus: GameStatus) => void;
   setRoomId:(roomId:string)=>void;
   setOwner:(owner:string)=>void;
-  updateProgress:(userId:string,progress:any)=>void;
+  //updateProgress:(userId:string,progress:any)=>void;
+  setProgress: (progress: Progress, socketId: string) => void;
+  setParagraph: (paragraph: string) => void;
+  setTimer: (timer: number) => void;
 }
 const useGameStore = create<GameState>()(
   devtools((set, get) => ({
     mode: GameModes.SINGLE_PLAYER,
     timer: 0,
-    duration: 0,
-    difficulty: 'easy',
+    duration: GameDuration.ONE_MIN,
+    difficulty:GameDifficulties.EASY,
     paragraph: null,
     loading: null,
     wpm: 0,
@@ -57,10 +58,21 @@ const useGameStore = create<GameState>()(
     incorrectWordsArray: [],
     roomId:null,
     owner:null,
+    progress:new Map();
     setOwner:(owner)=>set({owner})
     setRoomId:(roomId)=>set({roomId}),
-
+    setTimer: (timer) => set({ timer }),
+    setParagraph: (paragraph) => set({ paragraph }),
     setPlayers: (players) => set({ players }),
+    setDuration: (duration) => set({ duration }),
+    setMode: (mode) => set({ mode }),
+    setDificulty: (difficulty) => set({ difficulty }),
+    setProgress: (progress, socketId) => {
+      const progressMap = get().progress;
+      console.log(progressMap.keys(), progressMap.values());
+      progressMap.set(socketId, progress);
+      set({ progress: progressMap });
+    },
 
     setGameStatus: (gameStatus) => set({ gameStatus }),
     updateProgress:(userId,progress)=>{
@@ -108,7 +120,7 @@ const useGameStore = create<GameState>()(
       socket.emit('game-status',{
         status:GameStatus.PLAYING,
         roomId:get().roomId,
-        
+
       })
       const response = await fetchParagraphForGame(
         get().difficulty,

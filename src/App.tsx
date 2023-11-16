@@ -7,18 +7,20 @@ import { useEffect, useState } from 'react';
 import { socket } from './utils/socket';
 import GameSettings from './pages/GameSettings';
 import Game from './pages/Game'
+import useUserStore from './store/useUserStore';
+//import { useEffect } from 'react';
 //import useGameStore from './store/gameStore';
 function App(){
-  const [isConnected,setIsConnected]=useState(socket.connected);
+  const [setSocketId]=useUserStore((state)=>[state.setSocketId]);
   //const [setPlayers]=useGameStore((state)=>[state.setPlayers]);
 
   useEffect(() => {
     function onConnect() {
-      setIsConnected(true);
+      setSocketId(socket.id);
     }
 
     function onDisconnect() {
-      setIsConnected(false);
+      setSocketId(null);
     }
 
     socket.on('connect', onConnect);

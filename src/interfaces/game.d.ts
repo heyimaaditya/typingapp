@@ -4,7 +4,7 @@ export enum GameStatus{
   PLAYING,
   FINISHED,
 }
-export interface Player extends User{
+export interface Progress{
   wpm:number;
   accuracy:number;
 }
@@ -12,4 +12,14 @@ export enum GameModes{
   SINGLE_PLAYER,
   ONLINE,
   WITH_FRIENDS
+}
+export enum GameDifficulties{
+  EASY,
+  MEDIUM,
+  HARD,
+}
+export enum GameDuration{
+  ONE_MIN=60,
+  THREE_MIN=180,
+  FIVE_MIN=300,
 }
